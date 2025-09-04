@@ -1,4 +1,4 @@
-<!-- # 📝 Daily Journal App
+# 📝 Daily Journal App
 
 A simple and responsive **Daily Journal App** built with **HTML, CSS, and JavaScript**.  
 This project helps users write, save, and organize their journal entries for everyday use.  
@@ -29,4 +29,4 @@ This project helps users write, save, and organize their journal entries for eve
 ## 📂 Project Setup
 Clone the repository:
 ```bash
-git clone https://github.com/your-username/daily-journal.git -->
+git clone https://github.com/your-username/daily-journal.git
