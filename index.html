@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Journal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50px) translateY(-50px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header .date {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .entry-form {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .entry-form:hover {
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mood-option {
+            padding: 8px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .mood-option:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .mood-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .entries-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .entries-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .entry-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .entry-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .entry-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+
+        .entry-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .entry-mood {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .entry-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 15px;
+            font-size: 14px;
+            border-radius: 15px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .entry-form {
+                padding: 20px;
+            }
+
+            .entry-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📖 My Daily Journal</h1>
+            <div class="date" id="currentDate"></div>
+        </header>
+
+        <main class="main-content">
+            <div class="entry-form">
+                <form id="journalForm">
+                    <div class="form-group">
+                        <label for="entryTitle">Entry Title</label>
+                        <input type="text" id="entryTitle" placeholder="What's on your mind today?" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="entryContent">Your Thoughts</label>
+                        <textarea id="entryContent" placeholder="Write about your day, feelings, experiences..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>How are you feeling?</label>
+                        <div class="mood-selector">
+                            <div class="mood-option" data-mood="😊 Happy">😊 Happy</div>
+                            <div class="mood-option" data-mood="😢 Sad">😢 Sad</div>
+                            <div class="mood-option" data-mood="😴 Tired">😴 Tired</div>
+                            <div class="mood-option" data-mood="🤔 Thoughtful">🤔 Thoughtful</div>
+                            <div class="mood-option" data-mood="😌 Peaceful">😌 Peaceful</div>
+                            <div class="mood-option" data-mood="😤 Frustrated">😤 Frustrated</div>
+                            <div class="mood-option" data-mood="🎉 Excited">🎉 Excited</div>
+                            <div class="mood-option" data-mood="😰 Anxious">😰 Anxious</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">📝 Save Entry</button>
+                </form>
+            </div>
+
+            <div class="entries-section">
+                <h2>📚 Your Journal Entries</h2>
+                <div class="entries-container" id="entriesContainer">
+                    <div class="empty-state">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">📖</div>
+                        <h3>No entries yet</h3>
+                        <p>Start writing your first journal entry above!</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px; color: #333;">✏️ Edit Entry</h2>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editTitle">Entry Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editContent">Your Thoughts</label>
+                    <textarea id="editContent" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>How are you feeling?</label>
+                    <div class="mood-selector" id="editMoodSelector">
+                        <div class="mood-option" data-mood="😊 Happy">😊 Happy</div>
+                        <div class="mood-option" data-mood="😢 Sad">😢 Sad</div>
+                        <div class="mood-option" data-mood="😴 Tired">😴 Tired</div>
+                        <div class="mood-option" data-mood="🤔 Thoughtful">🤔 Thoughtful</div>
+                        <div class="mood-option" data-mood="😌 Peaceful">😌 Peaceful</div>
+                        <div class="mood-option" data-mood="😤 Frustrated">😤 Frustrated</div>
+                        <div class="mood-option" data-mood="🎉 Excited">🎉 Excited</div>
+                        <div class="mood-option" data-mood="😰 Anxious">😰 Anxious</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+                    <button type="button" class="btn btn-small" onclick="closeEditModal()" style="background: #6c757d;">Cancel</button>
+                    <button type="submit" class="btn btn-small">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let editingIndex = -1;
+        let selectedMood = '';
+        let selectedEditMood = '';
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            loadEntries();
+            setupEventListeners();
+        });
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        function setupEventListeners() {
+            // Journal form submission
+            document.getElementById('journalForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveEntry();
+            });
+
+            // Edit form submission
+            document.getElementById('editForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateEntry();
+            });
+
+            // Mood selection for main form
+            document.querySelectorAll('.mood-selector .mood-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from siblings
+                    this.parentNode.querySelectorAll('.mood-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    selectedMood = this.dataset.mood;
+                });
+            });
+
+            // Mood selection for edit modal
+            document.getElementById('editMoodSelector').addEventListener('click', function(e) {
+                if (e.target.classList.contains('mood-option')) {
+                    // Remove selected class from siblings
+                    this.querySelectorAll('.mood-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    // Add selected class to clicked option
+                    e.target.classList.add('selected');
+                    selectedEditMood = e.target.dataset.mood;
+                }
+            });
+
+            // Close modal when clicking outside
+            document.getElementById('editModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeEditModal();
+                }
+            });
+        }
+
+        function saveEntry() {
+            const title = document.getElementById('entryTitle').value;
+            const content = document.getElementById('entryContent').value;
+            
+            if (!selectedMood) {
+                alert('Please select your mood!');
+                return;
+            }
+
+            const entry = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                mood: selectedMood,
+                date: new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            entries.unshift(entry); // Add to beginning of array
+            saveToStorage();
+            renderEntries();
+            
+            // Clear form
+            document.getElementById('journalForm').reset();
+            document.querySelectorAll('.mood-selector .mood-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            selectedMood = '';
+
+            // Show success animation
+            showSuccessMessage();
+        }
+
+        function showSuccessMessage() {
+            const btn = document.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Saved!';
+            btn.style.background = 'linear-gradient(135deg, #00d2ff, #3a7bd5)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }, 2000);
+        }
+
+        function renderEntries() {
+            const container = document.getElementById('entriesContainer');
+            
+            if (entries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">📖</div>
+                        <h3>No entries yet</h3>
+                        <p>Start writing your first journal entry above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = entries.map((entry, index) => `
+                <div class="entry-card">
+                    <div class="entry-header">
+                        <div class="entry-title">${entry.title}</div>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div class="entry-mood">${entry.mood}</div>
+                            <div class="entry-date">${entry.date}</div>
+                        </div>
+                    </div>
+                    <div class="entry-content">${entry.content.replace(/\n/g, '<br>')}</div>
+                    <div class="entry-actions">
+                        <button class="btn btn-small btn-edit" onclick="editEntry(${index})">✏️ Edit</button>
+                        <button class="btn btn-small btn-delete" onclick="deleteEntry(${index})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editEntry(index) {
+            editingIndex = index;
+            const entry = entries[index];
+            
+            document.getElementById('editTitle').value = entry.title;
+            document.getElementById('editContent').value = entry.content;
+            
+            // Set selected mood
+            document.querySelectorAll('#editMoodSelector .mood-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.mood === entry.mood) {
+                    opt.classList.add('selected');
+                    selectedEditMood = entry.mood;
+                }
+            });
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function updateEntry() {
+            if (editingIndex === -1) return;
+
+            const title = document.getElementById('editTitle').value;
+            const content = document.getElementById('editContent').value;
+            
+            if (!selectedEditMood) {
+                alert('Please select your mood!');
+                return;
+            }
+
+            entries[editingIndex].title = title;
+            entries[editingIndex].content = content;
+            entries[editingIndex].mood = selectedEditMood;
+            
+            saveToStorage();
+            renderEntries();
+            closeEditModal();
+        }
+
+        function deleteEntry(index) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                entries.splice(index, 1);
+                saveToStorage();
+                renderEntries();
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingIndex = -1;
+            selectedEditMood = '';
+        }
+
+        function saveToStorage() {
+            // Since localStorage is not available, we'll keep entries in memory
+            // In a real environment, this would save to localStorage
+        }
+
+        function loadEntries() {
+            // Since localStorage is not available, we'll start with sample data
+            entries = [
+                {
+                    id: 1,
+                    title: "Welcome to Your Journal!",
+                    content: "This is a sample entry to show you how your journal will look. You can edit or delete this entry, and create new ones using the form above. Start writing about your day, your thoughts, or anything that's on your mind!",
+                    mood: "🎉 Excited",
+                    date: new Date().toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                }
+            ];
+            renderEntries();
+        }
+    </script>
+</body>
+</html>
